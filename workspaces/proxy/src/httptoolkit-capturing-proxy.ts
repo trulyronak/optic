@@ -181,16 +181,16 @@ export class HttpToolkitCapturingProxy {
             headers: headerObjectToList(req.headers),
             queryString,
             body: {
-              asJsonString: req.body.json ? JSON.stringify(req.body.json) : (req.body.formData ? JSON.stringify(req.body.formData) : undefined),
-              asText: req.body.text
+              asJsonString: req.body.json ? JSON.stringify(req.body.json) : (req.body.formData ? JSON.stringify(req.body.formData) : null),
+              asText: req.body.text || null
             }
           },
           response: {
             statusCode: res.statusCode,
             headers: headerObjectToList(res.headers),
             body: {
-              asJsonString: res.body.json ? JSON.stringify(res.body.json) : (res.body.formData ? JSON.stringify(res.body.formData) : undefined),
-              asText: res.body.text
+              asJsonString: res.body.json ? JSON.stringify(res.body.json) : (res.body.formData ? JSON.stringify(res.body.formData) : null),
+              asText: res.body.text || null
             }
           }
         };

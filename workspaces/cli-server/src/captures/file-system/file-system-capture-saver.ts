@@ -5,6 +5,7 @@ import * as path from 'path';
 import {ICaptureSaver} from './file-system-capture-loader';
 import {userDebugLogger} from '../../logger';
 import * as avro from 'avsc';
+import * as util from 'util';
 
 interface IFileSystemCaptureSaverConfig {
   captureBaseDirectory: string
@@ -26,6 +27,7 @@ class FileSystemCaptureSaver implements ICaptureSaver {
   async init(captureId: string) {
     const outputDirectory = path.join(this.config.captureBaseDirectory, captureId);
     await fs.ensureDir(outputDirectory);
+
     this.batcher.on('batch', async (items: IApiInteraction[]) => {
       userDebugLogger(`writing batch ${this.batchCount}`);
       const outputFile = path.join(outputDirectory, `${this.batchCount}${captureFileSuffix}`);
@@ -36,23 +38,7 @@ class FileSystemCaptureSaver implements ICaptureSaver {
           batchId: 'batch-id',
           captureId: 'capture-id'
         },
-        batchItems: [
-          {
-            uuid: 'ddd',
-            omitted: [],
-            request: {
-              headers: [],
-              host: 'hhh',
-              method: 'mmm',
-              path: '/ppp',
-              queryString: ''
-            },
-            response: {
-              headers: [],
-              statusCode: 200
-            }
-          }
-        ]
+        batchItems: items
       };
       try {
         const serialized = serdes.toBuffer(output);

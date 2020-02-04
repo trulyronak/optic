@@ -17,7 +17,6 @@ object MyTSTypes extends DefaultTSTypes {
 
   implicit val tsBody: TSType[Body] = TSType.interface("IBody",
     "asText" -> (TSString | TSNull),
-    "asForm" -> (TSString.array | TSNull),
     "asJsonString" -> (TSString | TSNull)
   )
 

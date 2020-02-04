@@ -55,16 +55,46 @@ export const lengthScala = (collection: any) => {
 
 const {ApiInteraction, ApiRequest, ApiResponse} = diff;
 
+export function extractContentType(headers: IHeader[], fallback: string | null) {
+  return headers.find(x => x.name === 'content-type')?.value || fallback;
+}
+
+export function extractRequestAndResponseBodyAsJs(sample: IApiInteraction) {
+  const requestContentType = extractContentType(sample.request.headers, null);
+  const responseContentType = extractContentType(sample.response.headers, null);
+  const requestBody = sample.request.body.asJsonString ? JSON.parse(sample.request.body.asJsonString) : (sample.request.body.asText ? sample.request.body.asText : undefined);
+  const responseBody = sample.response.body.asJsonString ? JSON.parse(sample.response.body.asJsonString) : (sample.response.body.asText ? sample.response.body.asText : undefined);
+  console.log({
+    sample,
+    requestContentType,
+    requestBody,
+    responseBody,
+    responseContentType
+  });
+  return {
+    requestContentType,
+    requestBody,
+    responseBody,
+    responseContentType
+  };
+}
+
 export function toInteraction(sample: IApiInteraction) {
-  const requestContentType = sample.request.headers.find(x => x.name === 'content-type')?.value || '*/*';
-  const responseContentType = sample.response.headers.find(x => x.name === 'content-type')?.value || '*/*';
+  const requestContentType = extractContentType(sample.request.headers, '*/*');
+  const responseContentType = extractContentType(sample.response.headers, '*/*');
 
-  const requestBody = sample.request.body?.asJsonString ? JSON.parse(sample.request.body.asJsonString) : sample.request.body?.asText;
-  const responseBody = sample.response.body?.asJsonString ? JSON.parse(sample.response.body.asJsonString) : sample.response.body?.asText;
-
+  const requestBody = sample.request.body.asJsonString ? fromJs(JSON.parse(sample.request.body.asJsonString)) : (sample.request.body.asText ? fromJs(sample.request.body.asText) : JsonHelper.toNone());
+  const responseBody = sample.response.body.asJsonString ? fromJs(JSON.parse(sample.response.body.asJsonString)) : (sample.response.body.asText ? fromJs(sample.response.body.asText) : JsonHelper.toNone());
+  console.log({
+    sample,
+    requestContentType,
+    requestBody,
+    responseBody,
+    responseContentType
+  });
   return ApiInteraction(
-    ApiRequest(sample.request.path, sample.request.method, sample.request.queryString || '', requestContentType, fromJs(requestBody)),
-    ApiResponse(sample.response.statusCode, responseContentType, fromJs(responseBody))
+    ApiRequest(sample.request.path, sample.request.method, sample.request.queryString || '', requestContentType, requestBody),
+    ApiResponse(sample.response.statusCode, responseContentType, responseBody)
   );
 }
 
@@ -77,7 +107,7 @@ export const {JsQueryStringParser} = opticEngine;
 export const OasProjectionHelper = contexts.rfc.projections.OASProjectionHelper();
 
 import {checkDiffOrUnrecognizedPath} from './check-diff';
-import {IApiInteraction} from './domain-types/optic-types';
+import {IApiInteraction, IHeader} from './domain-types/optic-types';
 
 export {
   checkDiffOrUnrecognizedPath

@@ -1,7 +1,14 @@
 
+export interface IResponse {
+  statusCode: number
+  headers: IHeader[]
+  body: IBody
+}
+       
+
 export interface IBody {
-  asText?: string
-  asJsonString?: string
+  asText: (string | null)
+  asJsonString: (string | null)
 }
        
 
@@ -10,16 +17,6 @@ export interface IGroupingIdentifiers {
   captureId: string
   agentId: string
   batchId: string
-}
-       
-
-export interface IRequest {
-  host: string
-  method: string
-  path: string
-  queryString: string
-  headers: IHeader[]
-  body?: IBody
 }
        
 
@@ -43,9 +40,12 @@ export interface IApiInteraction {
 }
        
 
-export interface IResponse {
-  statusCode: number
+export interface IRequest {
+  host: string
+  method: string
+  path: string
+  queryString: string
   headers: IHeader[]
-  body?: IBody
+  body: IBody
 }
        

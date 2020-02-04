@@ -23,7 +23,7 @@ class CommandAndProxySessionManager {
     await persistenceManager.init(this.config.captureId);
 
     inboundProxy.events.on('sample', (sample: IApiInteraction) => {
-      userDebugLogger(`got sample ${sample.request.method} ${sample.request.url}`);
+      userDebugLogger(`got sample ${sample.request.method} ${sample.request.path}`);
       persistenceManager.save(sample);
     });
 

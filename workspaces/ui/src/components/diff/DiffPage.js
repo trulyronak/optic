@@ -341,7 +341,7 @@ class DiffPage extends React.Component {
               </div>
 
               <div>
-                <Typography variant="h6" color="primary">Review API Diff -- {purpose}</Typography>
+                <Typography variant="h6" color="primary">Review API Diff — {purpose}</Typography>
               </div>
               <div style={{ flex: 1 }} />
 

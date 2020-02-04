@@ -37,7 +37,10 @@ describe('loading and saving samples to fs', function () {
             method: 'mmm',
             path: '/ppp',
             queryString: '',
-            body: null
+            body: {
+              asJsonString: '{}',
+              asText: null
+            }
           },
           response: {
             headers: [],
