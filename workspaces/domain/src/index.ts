@@ -1,7 +1,3 @@
-import {IApiInteraction} from './types';
-
-export {IApiInteraction};
-
 export const opticEngine = require('./domain.js');
 
 const {contexts, diff} = opticEngine.com.useoptic;
@@ -60,9 +56,15 @@ export const lengthScala = (collection: any) => {
 const {ApiInteraction, ApiRequest, ApiResponse} = diff;
 
 export function toInteraction(sample: IApiInteraction) {
+  const requestContentType = sample.request.headers.find(x => x.name === 'content-type')?.value || '*/*';
+  const responseContentType = sample.response.headers.find(x => x.name === 'content-type')?.value || '*/*';
+
+  const requestBody = sample.request.body?.asJsonString ? JSON.parse(sample.request.body.asJsonString) : sample.request.body?.asText;
+  const responseBody = sample.response.body?.asJsonString ? JSON.parse(sample.response.body.asJsonString) : sample.response.body?.asText;
+
   return ApiInteraction(
-    ApiRequest(sample.request.url, sample.request.method, sample.request.queryString || '', sample.request.headers['content-type'] || '*/*', fromJs(sample.request.body)),
-    ApiResponse(sample.response.statusCode, sample.response.headers['content-type'] || '*/*', fromJs(sample.response.body))
+    ApiRequest(sample.request.path, sample.request.method, sample.request.queryString || '', requestContentType, fromJs(requestBody)),
+    ApiResponse(sample.response.statusCode, responseContentType, fromJs(responseBody))
   );
 }
 
@@ -75,7 +77,10 @@ export const {JsQueryStringParser} = opticEngine;
 export const OasProjectionHelper = contexts.rfc.projections.OASProjectionHelper();
 
 import {checkDiffOrUnrecognizedPath} from './check-diff';
+import {IApiInteraction} from './domain-types/optic-types';
 
 export {
   checkDiffOrUnrecognizedPath
 };
+
+export * from './domain-types/optic-types';

@@ -3,10 +3,13 @@ import {Client} from '@useoptic/cli-client';
 import {IOpticTaskRunnerConfig, parseIgnore, TaskToStartConfig} from '@useoptic/cli-config';
 import {getPathsRelativeToConfig, readApiConfig, shouldWarnAboutVersion7Compatibility} from '@useoptic/cli-config';
 import {IApiCliConfig, IPathMapping} from '@useoptic/cli-config';
-import {ensureDaemonStarted, ensureDaemonStopped, FileSystemCaptureSaver} from '@useoptic/cli-server';
-import {ICaptureSaver, ICliDaemonState} from '@useoptic/cli-server';
-import {FileSystemCaptureLoader, ICaptureLoader} from '@useoptic/cli-server';
+import {ensureDaemonStarted, ensureDaemonStopped} from '@useoptic/cli-server';
 import {makeUiBaseUrl} from '@useoptic/cli-server';
+import {
+  FileSystemCaptureLoader,
+  ICaptureLoader
+} from '@useoptic/cli-server';
+import {FileSystemCaptureSaver, ICaptureSaver} from '@useoptic/cli-server';
 import {checkDiffOrUnrecognizedPath} from '@useoptic/domain';
 import * as colors from 'colors';
 import {fromOptic} from './conversation';

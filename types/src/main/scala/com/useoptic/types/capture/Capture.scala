@@ -24,5 +24,4 @@ case class Response(statusCode: Int, headers: Vector[Header], body: Option[Body]
 case class Header(name: String, value: String)
 
 case class Body(asText: Option[String],
-                asForm: Option[Vector[String]],
                 asJsonString: Option[String])

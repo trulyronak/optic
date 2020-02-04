@@ -1,10 +1,26 @@
 import {IIgnoreRunnable} from '@useoptic/cli-config';
 import {IApiInteraction} from '@useoptic/domain';
+import {ICapture} from '@useoptic/domain';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import {captureFileSuffix} from './file-system-capture-saver';
-import {ICaptureLoader, ICaptureManifest} from './index';
-import {developerDebugLogger} from './logger';
+import {captureFileSuffix, serdes} from './file-system-capture-saver';
+import {developerDebugLogger} from '../../logger';
+
+export interface ICaptureManifest {
+  samples: IApiInteraction[]
+}
+
+export interface ICaptureLoader {
+  load(captureId: string): Promise<ICaptureManifest>
+
+  loadWithFilter(captureId: string, filter: IIgnoreRunnable): Promise<ICaptureManifest>
+}
+
+export interface ICaptureSaver {
+  init(captureId: string): Promise<void>
+
+  save(sample: IApiInteraction): Promise<void>
+}
 
 interface IFileSystemCaptureLoaderConfig {
   captureBaseDirectory: string
@@ -35,8 +51,12 @@ class FileSystemCaptureLoader implements ICaptureLoader {
   async load(captureId: string): Promise<ICaptureManifest> {
     const captureFiles = await this.listSortedCaptureFiles(captureId);
     //@TODO: robustify by only reading n files at a time
-    const entriesContents: IApiInteraction[][] = await Promise.all(captureFiles.map(x => fs.readJson(x)));
-    const allSamples = entriesContents.reduce((acc, entrySamples) => [...acc, ...entrySamples], []);
+    const entriesContents: ICapture[] = await Promise.all(captureFiles.map(x => {
+      return fs.readFile(x).then(contents => {
+        return serdes.fromBuffer(contents);
+      });
+    }));
+    const allSamples = entriesContents.reduce((acc: IApiInteraction[], capture: ICapture) => [...acc, ...capture.batchItems], []);
     return {
       samples: allSamples
     };
@@ -45,10 +65,14 @@ class FileSystemCaptureLoader implements ICaptureLoader {
   async loadWithFilter(captureId: string, filter: IIgnoreRunnable): Promise<ICaptureManifest> {
     const captureFiles = await this.listSortedCaptureFiles(captureId);
     //@TODO: robustify by only reading n files at a time
-    const entriesContents: IApiInteraction[][] = await Promise.all(captureFiles.map(x => fs.readJson(x)));
-    const filteredSamples = entriesContents.reduce((acc: IApiInteraction[], entrySamples: IApiInteraction[]) => {
-      const filteredEntrySamples = entrySamples.filter((x: IApiInteraction) => {
-        return !filter.shouldIgnore(x.request.method, x.request.url);
+    const entriesContents: ICapture[] = await Promise.all(captureFiles.map(x => {
+      return fs.readFile(x).then(contents => {
+        return serdes.fromBuffer(contents);
+      });
+    }));
+    const filteredSamples = entriesContents.reduce((acc: IApiInteraction[], capture: ICapture) => {
+      const filteredEntrySamples = capture.batchItems.filter((x: IApiInteraction) => {
+        return !filter.shouldIgnore(x.request.method, x.request.path);
       });
       return [...acc, ...filteredEntrySamples];
     }, []);
