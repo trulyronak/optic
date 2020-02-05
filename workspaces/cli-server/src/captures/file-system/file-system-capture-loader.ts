@@ -5,6 +5,7 @@ import * as fs from 'fs-extra';
 import * as path from 'path';
 import {captureFileSuffix, serdes} from './file-system-capture-saver';
 import {developerDebugLogger} from '../../logger';
+import * as avro from 'avsc';
 
 export interface ICaptureManifest {
   samples: IApiInteraction[]
@@ -51,11 +52,18 @@ class FileSystemCaptureLoader implements ICaptureLoader {
   async load(captureId: string): Promise<ICaptureManifest> {
     const captureFiles = await this.listSortedCaptureFiles(captureId);
     //@TODO: robustify by only reading n files at a time
-    const entriesContents: ICapture[] = await Promise.all(captureFiles.map(x => {
-      return fs.readFile(x).then(contents => {
-        return serdes.fromBuffer(contents);
-      });
-    }));
+    const entriesContents: ICapture[] = await Promise.all(
+      captureFiles.map(x => {
+        const decoder = avro.createFileDecoder(x);
+
+        return new Promise<ICapture>((resolve, reject) => {
+          decoder.once('data', (contents: ICapture) => {
+            resolve(contents);
+          });
+          decoder.once('error', (err) => reject(err));
+        });
+      })
+    );
     const allSamples = entriesContents.reduce((acc: IApiInteraction[], capture: ICapture) => [...acc, ...capture.batchItems], []);
     return {
       samples: allSamples
@@ -65,11 +73,18 @@ class FileSystemCaptureLoader implements ICaptureLoader {
   async loadWithFilter(captureId: string, filter: IIgnoreRunnable): Promise<ICaptureManifest> {
     const captureFiles = await this.listSortedCaptureFiles(captureId);
     //@TODO: robustify by only reading n files at a time
-    const entriesContents: ICapture[] = await Promise.all(captureFiles.map(x => {
-      return fs.readFile(x).then(contents => {
-        return serdes.fromBuffer(contents);
-      });
-    }));
+    const entriesContents: ICapture[] = await Promise.all(
+      captureFiles.map(x => {
+        const decoder = avro.createFileDecoder(x);
+
+        return new Promise<ICapture>((resolve, reject) => {
+          decoder.once('data', (contents: ICapture) => {
+            resolve(contents);
+          });
+          decoder.once('error', (err) => reject(err));
+        });
+      })
+    );
     const filteredSamples = entriesContents.reduce((acc: IApiInteraction[], capture: ICapture) => {
       const filteredEntrySamples = capture.batchItems.filter((x: IApiInteraction) => {
         return !filter.shouldIgnore(x.request.method, x.request.path);

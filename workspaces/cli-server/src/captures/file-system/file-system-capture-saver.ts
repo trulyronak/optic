@@ -14,7 +14,7 @@ interface IFileSystemCaptureSaverConfig {
 export const schema = require('@useoptic/domain/build/domain-types/avro-schemas/capture.json');
 export const serdes = avro.Type.forSchema(schema);
 
-export const captureFileSuffix = '.optic-capture.json';
+export const captureFileSuffix = '.optic-capture.avro';
 
 class FileSystemCaptureSaver implements ICaptureSaver {
   private batcher: Bottleneck.Batcher = new Bottleneck.Batcher({maxSize: 100, maxTime: 1000});
@@ -41,8 +41,21 @@ class FileSystemCaptureSaver implements ICaptureSaver {
         batchItems: items
       };
       try {
-        const serialized = serdes.toBuffer(output);
-        await fs.writeFile(outputFile, serialized);
+        const encoder = avro.createFileEncoder(outputFile, schema);
+        await new Promise((resolve, reject) => {
+          encoder.write(output, (err) => {
+            if (err) {
+              return reject(err);
+            }
+            resolve();
+          });
+        });
+        await new Promise((resolve, reject) => {
+          encoder.end(() => {
+            resolve();
+          });
+        });
+        userDebugLogger(`wrote batch ${this.batchCount}`);
         this.batchCount += 1;
       } catch (e) {
         console.error(e);
