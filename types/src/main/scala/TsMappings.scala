@@ -27,6 +27,6 @@ object MyTSTypes extends DefaultTSTypes {
   implicit val tsResponse = TSType.fromCaseClass[Response]
   // TSType.fromCaseClass will convert your case class to a typescript definition
   // `- ssn` indicated the ssn field should be removed
-  implicit val tsInteraction = TSType.fromCaseClass[ApiInteraction]
+  implicit val tsInteraction = TSType.fromCaseClass[HttpInteraction]
   implicit val tsCapture = TSType.fromCaseClass[Capture]
 }
