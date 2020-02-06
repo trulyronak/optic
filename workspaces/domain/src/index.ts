@@ -59,7 +59,7 @@ export function extractContentType(headers: IHeader[], fallback: string | null) 
   return headers.find(x => x.name === 'content-type')?.value || fallback;
 }
 
-export function extractRequestAndResponseBodyAsJs(sample: IApiInteraction) {
+export function extractRequestAndResponseBodyAsJs(sample: IHttpInteraction) {
   const requestContentType = extractContentType(sample.request.headers, null);
   const responseContentType = extractContentType(sample.response.headers, null);
   const requestBody = sample.request.body.asJsonString ? JSON.parse(sample.request.body.asJsonString) : (sample.request.body.asText ? sample.request.body.asText : undefined);
@@ -79,7 +79,7 @@ export function extractRequestAndResponseBodyAsJs(sample: IApiInteraction) {
   };
 }
 
-export function toInteraction(sample: IApiInteraction) {
+export function toInteraction(sample: IHttpInteraction) {
   const requestContentType = extractContentType(sample.request.headers, '*/*');
   const responseContentType = extractContentType(sample.response.headers, '*/*');
 
@@ -107,7 +107,7 @@ export const {JsQueryStringParser} = opticEngine;
 export const OasProjectionHelper = contexts.rfc.projections.OASProjectionHelper();
 
 import {checkDiffOrUnrecognizedPath} from './check-diff';
-import {IApiInteraction, IHeader} from './domain-types/optic-types';
+import {IHttpInteraction, IHeader} from './domain-types/optic-types';
 
 export {
   checkDiffOrUnrecognizedPath

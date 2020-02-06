@@ -7,7 +7,7 @@ import * as fs from 'fs-extra';
 import launcher from '@httptoolkit/browser-launcher';
 import {CallbackResponseResult} from 'mockttp/dist/rules/handlers';
 import {CompletedRequest, MockRuleData} from 'mockttp';
-import {IApiInteraction} from '@useoptic/domain';
+import {IHttpInteraction} from '@useoptic/domain';
 import {developerDebugLogger} from './logger';
 import {IncomingHttpHeaders} from 'http';
 
@@ -171,7 +171,7 @@ export class HttpToolkitCapturingProxy {
         }
         const queryString: string = url.parse(req.url).query || '';
         developerDebugLogger(req);
-        const sample: IApiInteraction = {
+        const sample: IHttpInteraction = {
           omitted: [],
           uuid: res.id,
           request: {

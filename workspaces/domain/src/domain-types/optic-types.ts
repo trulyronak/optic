@@ -1,4 +1,10 @@
 
+export interface ICapture {
+  groupingIdentifiers: IGroupingIdentifiers
+  batchItems: IHttpInteraction[]
+}
+       
+
 export interface IResponse {
   statusCode: number
   headers: IHeader[]
@@ -20,19 +26,13 @@ export interface IGroupingIdentifiers {
 }
        
 
-export interface ICapture {
-  groupingIdentifiers: IGroupingIdentifiers
-  batchItems: IApiInteraction[]
-}
-       
-
 export interface IHeader {
   name: string
   value: string
 }
        
 
-export interface IApiInteraction {
+export interface IHttpInteraction {
   uuid: string
   request: IRequest
   response: IResponse

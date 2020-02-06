@@ -1,7 +1,7 @@
-import {IApiInteraction, opticEngine, toInteraction} from './index';
+import {IHttpInteraction, opticEngine, toInteraction} from './index';
 import * as fs from 'fs-extra';
 
-export async function checkDiffOrUnrecognizedPath(specStorePath: string, samples: IApiInteraction[]) {
+export async function checkDiffOrUnrecognizedPath(specStorePath: string, samples: IHttpInteraction[]) {
   const specStoreExists = await fs.pathExists(specStorePath);
   if (!specStoreExists) {
     return Promise.resolve(true);
