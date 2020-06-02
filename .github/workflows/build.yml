@@ -56,7 +56,7 @@ jobs:
       run: ls -laR "$GITHUB_WORKSPACE/workspaces/domain/src"
     - name: "check domain build directory"
       run: ls -laR "$GITHUB_WORKSPACE/workspaces/domain/build"
-    - name: "mkdir docker/private-npm-registry/storage && yarn start local npm registry"
-      run: yarn run registry:start
+    - name: "start local registry"
+      run: mkdir docker/private-npm-registry/storage && yarn run registry:start
     - name: "publish to local registry"
       run: source sourceme.sh && optic_build_and_publish_locally
