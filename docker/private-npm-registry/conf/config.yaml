@@ -12,5 +12,6 @@ packages:
 uplinks:
   npmjs:
     url: https://registry.npmjs.org/
+max_body_size: 1000mb
 logs:
   - {type: stdout, format: pretty, level: trace}
