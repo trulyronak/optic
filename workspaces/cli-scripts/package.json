@@ -1,6 +1,5 @@
 {
   "name": "@useoptic/cli-scripts",
-  "version": "8.2.8",
   "scripts": {
     "ws:test": "echo scripts",
     "ws:build": "yarn run tsc -b --verbose",
@@ -15,8 +14,7 @@
   "types": "build/index.d.ts",
   "dependencies": {
     "node-notifier": "^7.0.0",
-    "analytics-node": "^3.4.0-beta.1",
-    "@useoptic/cli-shared": "8.2.8"
+    "analytics-node": "^3.4.0-beta.1"
   },
   "devDependencies": {
     "@types/node-notifier": "^6.0.1"
