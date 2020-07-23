@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[5],{748:function(e,t,n){"use strict";n.r(t),n.d(t,"default",(function(){return r}));var a=n(0),c=n.n(a),o=n(96),i=n(99);function r(){var e=l();return c.a.createElement(o.a,{title:"Optic - Coming soon: Live contract testing"},c.a.createElement(o.a.Navbar,{mini:!0}),c.a.createElement(o.a.Body,null,c.a.createElement("div",{className:e.root},c.a.createElement("h2",null,"Coming soon: Live contract testing"))))}var l=Object(i.a)((function(e){}))}}]);
+//# sourceMappingURL=5.66d5c40f.chunk.js.map
