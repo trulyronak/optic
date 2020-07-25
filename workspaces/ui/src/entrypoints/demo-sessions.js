@@ -19,6 +19,74 @@ import {
 } from '@useoptic/domain-utilities';
 import { Button } from '@material-ui/core';
 import { trackEmitter } from "../Analytics"
+import { useMachine } from '@xstate/react';
+import { Machine } from 'xstate';
+
+const events = {
+  viewDiffPage: "Changed to ENDPOINT_DIFFS",
+  viewSpecificDiff: "Viewing Endpoint Diff",
+  viewUndocumentedUrlsPage: "Changed to UNDOCUMENTED_URL",
+  viewSpecificUndocumentedUrl: "On Undocumented Url",
+  viewNamingEndpoint: "Naming Endpoint",
+  viewFinalizeCard: "Rendered Finalize Card",
+  commit: "Committed Changes to Endpoint",
+}
+
+const states = {
+  endpointDiffPage: "viewing all endpoint diffs",
+  endpointDiffViewPage: "viewing specific endpoint diff",
+  undocumentedUrlPage: "viewing all undocumented urls",
+  undocumentedUrlOnParameterized: "choosing parameter for specific undocumented url",
+  undocumentedUrlOnNaming: "choosing name for specific undocumented url",
+  onFinalizeRender: "writing commit message page", 
+}
+
+const navbar = {
+  [events.viewDiffPage]: [states.endpointDiffPage]
+}
+
+const demoMachine = Machine({
+  id: 'demo',
+  initial: [states.endpointDiffPage],
+  states: {
+    [states.endpointDiffPage]: {
+      on: {
+        [events.viewSpecificDiff]: [states.endpointDiffViewPage],
+        [events.viewUndocumentedUrlsPage]: [states.undocumentedUrlPage],
+        ...navbar
+      }
+    },
+    [states.endpointDiffViewPage]: {
+      on: {
+        [events.viewFinalizeCard]: [states.onFinalizeRender],
+        ...navbar
+      }
+    },
+    [states.onFinalizeRender]: {
+      on: {
+        [events.commit]: [states.endpointDiffPage],
+        ...navbar
+      }
+    },
+    [states.undocumentedUrlPage]: {
+      on: {
+        [events.viewSpecificUndocumentedUrl]: [states.undocumentedUrlOnParameterized],
+        ...navbar
+      }
+    },
+    [states.undocumentedUrlOnParameterized]: {
+      on: {
+        [events.viewNamingEndpoint]: [states.undocumentedUrlOnNaming]
+      }
+    },
+    [states.undocumentedUrlOnNaming]: {
+      on: {
+        [events.onFinalizeRender]: [states.onFinalizeRender]
+      }
+    }
+
+  }
+})
 
 export default function DemoSessions(props) {
   const match = useRouteMatch();
@@ -26,6 +94,7 @@ export default function DemoSessions(props) {
   const [showModal, setShowDemoModal] = useState(false);
   const [actionsCompleted, setActions] = useState(0);
   const history = useHistory();
+  const [state, send] = useMachine(demoMachine)
 
   const session = useMockSession({
     sessionId: sessionId,
@@ -122,6 +191,7 @@ export default function DemoSessions(props) {
 
   // event specific info boxes
   trackEmitter.on('event', (event, eventProps) => {
+    send(event)
     switch (event) {
       case "Show Initial Documentation Page" : {
         setAction(null)
